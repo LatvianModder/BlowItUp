@@ -7,4 +7,7 @@ public class TileAir extends Tile
 {
 	public TileAir(String id)
 	{ super(id); }
+
+	public boolean isTransparent()
+	{ return true; }
 }

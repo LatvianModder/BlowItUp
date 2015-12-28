@@ -17,6 +17,15 @@ public class Tile extends FinalIDObject
 		super(id);
 	}
 
+	public <E extends Tile> E register()
+	{ Tiles.registry.register(ID, this); return (E)this; }
+
+	public int getLightValue()
+	{ return 0; }
+
+	public boolean isTransparent()
+	{ return getLightValue() > 0; }
+
 	public Texture getTexture(TextureManager m, int side)
 	{
 		if(texture == null)
@@ -26,7 +35,4 @@ public class Tile extends FinalIDObject
 
 	public ITileRenderer getRenderer()
 	{ return DefaultTileRenderer.instance; }
-
-	public <E extends Tile> E register()
-	{ Tiles.registry.register(ID, this); return (E)this; }
 }

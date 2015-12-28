@@ -6,9 +6,11 @@ package latmod.blowitup.world;
 public class World
 {
 	public final Level level;
+	public final WorldRenderer renderer;
 
 	public World(Level l)
 	{
 		level = l;
+		renderer = new WorldRenderer(this);
 	}
 }

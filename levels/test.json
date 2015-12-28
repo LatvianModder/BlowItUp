@@ -1,5 +1,11 @@
 {
   "id": "test_level",
-  "width": 20,
-  "heigt": 15
+  "image": "/test_level.png",
+  "spawnpoints": "#FF0000",
+  "tiles": {
+    "#808080": "stone",
+    "#FF6A00": "planks",
+    "#B200FF": "lamp",
+    "#B200FA": "item_random"
+  }
 }

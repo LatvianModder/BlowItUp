@@ -1,0 +1,22 @@
+{
+  "id": "test_level",
+  "image": "/test_level.png",
+  "spawnpoints": "#FF0000",
+  "ambient_light": 0.0,
+  "tiles": {
+    "stone":
+    {
+      "color": "#808080"
+    },
+    "planks":
+    {
+      "color": "#FF6A00",
+      "can_explode": true
+    },
+    "lamp":
+    {
+      "color": "#FFD800",
+      "light_value": 5.0
+    }
+  }
+}

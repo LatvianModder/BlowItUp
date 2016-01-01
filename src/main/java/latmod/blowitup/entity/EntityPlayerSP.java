@@ -1,8 +1,11 @@
 package latmod.blowitup.entity;
 
-import latmod.blowitup.Main;
-import latmod.core.input.*;
-import latmod.lib.util.Pos2D;
+import latmod.blowitup.*;
+import latmod.blowitup.tile.Tile;
+import latmod.blowitup.world.*;
+import latmod.core.input.LMMouse;
+import latmod.core.rendering.Renderer;
+import latmod.lib.util.*;
 import org.lwjgl.input.Keyboard;
 
 /**
@@ -10,46 +13,56 @@ import org.lwjgl.input.Keyboard;
  */
 public class EntityPlayerSP extends EntityPlayer
 {
+	public WorldClient clientWorld;
+
 	public EntityPlayerSP()
 	{
 		super();
 	}
 
+	public void onCreated()
+	{
+		super.onCreated();
+		clientWorld = (WorldClient)world;
+	}
+
 	public void onUpdate()
 	{
+		Pos2I posI1 = posI.clone();
+
 		double mx = 0D;
 		double my = 0D;
-		double m = 0.1D;
-		if(LMKeyboard.isCtrlDown()) m = 0.25D;
-		else if(LMKeyboard.isShiftDown()) m = 0.03D;
+		double m = 0.06D;
 
-		boolean keyLeft = LMKeyboard.isKeyDown(Keyboard.KEY_A);
-		boolean keyDown = LMKeyboard.isKeyDown(Keyboard.KEY_S);
-		boolean keyRight = LMKeyboard.isKeyDown(Keyboard.KEY_D);
-		boolean keyUp = LMKeyboard.isKeyDown(Keyboard.KEY_W);
+		boolean keyLeft = Settings.KeyBinding.left.isPressed();
+		boolean keyRight = Settings.KeyBinding.right.isPressed();
+
+		flags[SNEAKING] = Settings.KeyBinding.sneak.isPressed();
+
+		if(flags[SNEAKING]) m *= 0.5D;
 
 		if(keyLeft)
 		{
 			mx -= m;
-			rotation = 270F;
+			rotation = 180F;
 		}
 		if(keyRight)
 		{
 			mx += m;
-			rotation = 90F;
+			rotation = 0F;
 		}
-		if(keyUp)
+		if(Settings.KeyBinding.up.isPressed())
 		{
 			my -= m;
-			rotation = 0F;
+			rotation = 270F;
 
 			if(keyLeft) rotation -= 45F;
 			else if(keyRight) rotation += 45F;
 		}
-		if(keyDown)
+		if(Settings.KeyBinding.down.isPressed())
 		{
 			my += m;
-			rotation = 180F;
+			rotation = 90F;
 
 			if(keyLeft) rotation += 45F;
 			else if(keyRight) rotation -= 45F;
@@ -57,15 +70,45 @@ public class EntityPlayerSP extends EntityPlayer
 
 		if(LMMouse.dx != 0 || LMMouse.dy != 0 || LMMouse.isButtonDown(0))
 		{
-			Pos2D screen = Main.inst.clientWorld.renderer.getPosOnScreen(pos.x, pos.y);
+			Pos2D screen = clientWorld.renderer.getPosOnScreen(pos.x, pos.y);
 
-			rotation = (float)(Math.atan2(LMMouse.y - screen.y, LMMouse.x - screen.x) * 180D / Math.PI) + 90F;
+			rotation = (float)(Math.atan2(LMMouse.y - screen.y, LMMouse.x - screen.x) * 180D / Math.PI);
 		}
 
 		if(move(mx, my))
 		{
-			Main.inst.clientWorld.renderer.camera.set(pos.x, pos.y);
-			Main.inst.clientWorld.renderer.markLightDirty();
+			markDirty();
 		}
+
+		clientWorld.renderer.camera.set(pos.x, pos.y);
+
+		if(flags[LIGHT] && !posI.equalsPos(posI1))
+			clientWorld.renderer.markLightDirty();
+		posI.set(posI1.x, posI1.y);
+	}
+
+	public void onRender(GameRenderer r)
+	{
+		super.onRender(r);
+	}
+
+	public void keyPressed(int key)
+	{
+		if(key == Settings.KeyBinding.flashlight.get())
+		{
+			flags[LIGHT] = !flags[LIGHT];
+			markDirty();
+			clientWorld.renderer.markLightDirty();
+		}
+
+		Pos2I p = clientWorld.renderer.mouse.toPos2I();
+
+		if(key == Keyboard.KEY_R)
+			clientWorld.level.setTile(p, Tile.air);
+		else if(key == Keyboard.KEY_L)
+			clientWorld.level.setTile(p, clientWorld.level.getTileFromID("lamp"));
+		else if(key == Keyboard.KEY_P)
+			clientWorld.level.setTile(p, clientWorld.level.getTileFromID("planks"));
+		clientWorld.renderer.markDirty();
 	}
 }

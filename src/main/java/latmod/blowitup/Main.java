@@ -2,17 +2,18 @@ package latmod.blowitup;
 
 import com.google.gson.*;
 import latmod.blowitup.entity.EntityRegistry;
-import latmod.blowitup.tile.Tile;
+import latmod.blowitup.gui.*;
 import latmod.blowitup.world.*;
 import latmod.core.*;
 import latmod.core.input.keys.*;
 import latmod.core.input.mouse.*;
 import latmod.core.rendering.*;
 import latmod.lib.*;
-import latmod.lib.util.Pos2I;
 import org.lwjgl.input.*;
+import org.xml.sax.XMLReader;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.logging.Logger;
 
 /**
@@ -34,6 +35,7 @@ public class Main extends LMFrame implements IKeyPressed, IMouseScrolled, IMouse
 	public WorldClient clientWorld = null;
 	public FastList<Object> debugInfo;
 	public static final FastMap<String, Level> levels = new FastMap<>();
+	public GuiBase currentGui = null;
 
 	public void onLoaded() throws Exception
 	{
@@ -48,6 +50,7 @@ public class Main extends LMFrame implements IKeyPressed, IMouseScrolled, IMouse
 		loadLevels();
 		EntityRegistry.init();
 
+		currentGui = new GuiStart();
 		debugInfo = new FastList<>();
 	}
 
@@ -91,15 +94,12 @@ public class Main extends LMFrame implements IKeyPressed, IMouseScrolled, IMouse
 
 		if(clientWorld != null)
 		{
-			debugInfo.add("WorldID: " + clientWorld.level.ID);
-
-			clientWorld.clientPlayer.onUpdate();
-
+			clientWorld.onUpdate();
 			clientWorld.renderer.render(renderer);
-
-			debugInfo.add(clientWorld.renderer.getPosOnScreen(clientWorld.clientPlayer.pos.x, clientWorld.clientPlayer.pos.y));
 			//debugInfo.add(clientWorld.level.getTile(clientWorld.renderer.mouse.toPos2I()));
 		}
+
+		currentGui.onRender();
 
 		for(int i = 0; i < debugInfo.size(); i++)
 			font.drawText(4D, 4D + i * 20, String.valueOf(debugInfo.get(i)));
@@ -116,18 +116,8 @@ public class Main extends LMFrame implements IKeyPressed, IMouseScrolled, IMouse
 			return;
 		}
 
-		if(clientWorld == null) return;
-
-		Pos2I p = clientWorld.renderer.mouse.toPos2I();
-
-		if(e.key == Keyboard.KEY_R)
-			clientWorld.level.setTile(p, Tile.air);
-		else if(e.key == Keyboard.KEY_L)
-			clientWorld.level.setTile(p, clientWorld.level.getTileFromID("lamp"));
-		else if(e.key == Keyboard.KEY_P)
-			clientWorld.level.setTile(p, clientWorld.level.getTileFromID("planks"));
-
-		clientWorld.renderer.markDirty();
+		if(clientWorld != null)
+			clientWorld.clientPlayer.keyPressed(e.key);
 	}
 
 	public void onMousePressed(EventMousePressed e)

@@ -1,6 +1,7 @@
 package latmod.blowitup.world;
 
 import com.google.gson.*;
+import javafx.geometry.Pos;
 import latmod.blowitup.tile.Tile;
 import latmod.lib.*;
 import latmod.lib.util.*;
@@ -114,6 +115,9 @@ public class Level extends FinalIDObject
 
 	public boolean exists(Pos2I pos)
 	{ return pos != null && exists(pos.x, pos.y); }
+
+	public Pos2I getRandomSpawnpoint()
+	{ return spawnpoints.get(MathHelperLM.rand.nextInt(spawnpoints.size())); }
 
 	public void writeToIO(DataOutput io) throws Exception
 	{

@@ -1,7 +1,7 @@
 package latmod.blowitup.entity;
 
 import latmod.blowitup.GameRenderer;
-import latmod.blowitup.world.World;
+import latmod.blowitup.world.*;
 import latmod.lib.Bits;
 import latmod.lib.*;
 import latmod.lib.util.Pos2D;
@@ -15,11 +15,14 @@ public class Entity
 {
 	public static final int DEAD = 0;
 	public static final int DIRTY = 1;
+	public static final int SNEAKING = 2;
+	public static final int LIGHT = 3;
 
 	public World world;
 	public int worldID;
 	public final Pos2D pos;
 	public final boolean[] flags;
+	public double radius = 0.75D;
 
 	public Entity()
 	{
@@ -70,6 +73,32 @@ public class Entity
 		double px = pos.x;
 		double py = pos.y;
 
+		AABB box = createAABB();
+		if(box != null)
+		{
+			boolean collision = false;
+			AABB box1 = box.add(mx, 0D);
+
+			for(AABB aabb : world.aabbs)
+			{
+				if(aabb.collidesWith(box1))
+				{ collision = true; break; }
+			}
+
+			if(collision) mx = 0D;
+
+			collision = false;
+			box1 = box.add(0D, my);
+
+			for(AABB aabb : world.aabbs)
+			{
+				if(aabb.collidesWith(box1))
+				{ collision = true; break; }
+			}
+
+			if(collision) my = 0D;
+		}
+
 		//FIXME: Walls
 		pos.x += mx;
 		pos.y += my;
@@ -78,5 +107,11 @@ public class Entity
 		pos.y = MathHelperLM.clamp(pos.y, 0.5D, world.level.height - 0.5D);
 
 		return px != pos.x || py != pos.y;
+	}
+
+	public AABB createAABB()
+	{
+		double s = radius / 2D;
+		return new AABB(pos.x - s, pos.y - s, pos.x + s, pos.y + s);
 	}
 }

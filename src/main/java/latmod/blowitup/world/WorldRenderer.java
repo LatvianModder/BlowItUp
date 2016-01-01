@@ -141,7 +141,7 @@ public class WorldRenderer
 			for(int y = 0; y < h; y++) for(int x = 0; x < w; x++)
 			{
 				LightTile l = lightMap[x][y];
-				l.c = l.nn = l.pn = l.np = l.pp = world.level.ambient_light;
+				l.c = world.level.ambient_light;
 			}
 
 			for(Map.Entry<Pos2I, Tile> e : world.level.tiles())
@@ -157,7 +157,8 @@ public class WorldRenderer
 			for(Pos2I p1 : world.level.spawnpoints)
 				putLight(p1.x, p1.y, 3F, true);
 
-			putLight((int) camera.x, (int) camera.y, 5F, true);
+			if(world.clientPlayer.flags[Entity.LIGHT])
+				putLight((int) camera.x, (int) camera.y, 5F, true);
 
 			for(int y = 0; y < h; y++) for(int x = 0; x < w; x++)
 			{

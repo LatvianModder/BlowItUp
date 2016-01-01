@@ -1,4 +1,14 @@
 {
+  "keys": {
+    "attack": 57,
+    "chat": 21,
+    "down": 31,
+    "flashlight": 33,
+    "left": 30,
+    "right": 32,
+    "sneak": 42,
+    "up": 17
+  },
   "player_color": -16739073,
   "username": "Player"
 }

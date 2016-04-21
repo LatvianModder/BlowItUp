@@ -1,42 +1,39 @@
-package latmod.blowitup;
+package latmod.blowitup.client;
 
 import com.google.gson.*;
 import latmod.blowitup.entity.EntityRegistry;
-import latmod.blowitup.gui.*;
-import latmod.blowitup.world.*;
+import latmod.blowitup.gui.GuiStart;
+import latmod.blowitup.world.Level;
 import latmod.core.*;
-import latmod.core.input.keys.*;
-import latmod.core.input.mouse.*;
+import latmod.core.input.*;
 import latmod.core.rendering.*;
-import latmod.lib.*;
+import latmod.lib.LMJsonUtils;
 import org.lwjgl.input.*;
-import org.xml.sax.XMLReader;
 
 import java.io.File;
-import java.util.Collections;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 /**
  * Created by LatvianModder on 27.12.2015.
  */
-public class Main extends LMFrame implements IKeyPressed, IMouseScrolled, IMousePressed
+public class GameClient extends LMFrame
 {
-	public static Main inst = null;
-	public static final Logger logger = Logger.getLogger("Game");
-
-	public Main(String[] args) throws Exception
+	public static GameClient inst = null;
+	public static final Logger logger = Logger.getLogger("GameClient");
+	
+	public GameClient(String[] args) throws Exception
 	{ super(args, 800, 600); }
-
+	
 	public static void main(String[] args) throws Exception
-	{ inst = new Main(args); }
-
+	{ inst = new GameClient(args); }
+	
 	public File gameLocation = null;
-	public GameRenderer renderer;
 	public WorldClient clientWorld = null;
-	public FastList<Object> debugInfo;
-	public static final FastMap<String, Level> levels = new FastMap<>();
-	public GuiBase currentGui = null;
-
+	public List<Object> debugInfo;
+	public static final Map<String, Level> levels = new HashMap<>();
+	
 	public void onLoaded() throws Exception
 	{
 		super.onLoaded();
@@ -44,22 +41,21 @@ public class Main extends LMFrame implements IKeyPressed, IMouseScrolled, IMouse
 		setTitle("Blow It Up");
 		gameLocation = new File("game/");
 		if(!gameLocation.exists()) gameLocation.mkdirs();
-		renderer = new GameRenderer(resManager, textureManager);
-		Settings.load();
-
+		ClientSettings.load();
+		
 		loadLevels();
 		EntityRegistry.init();
-
-		currentGui = new GuiStart();
-		debugInfo = new FastList<>();
+		
+		openGui(new GuiStart());
+		debugInfo = new ArrayList<>();
 	}
-
+	
 	public static void loadLevels()
 	{
 		levels.clear();
-		File f = new File(Main.inst.gameLocation, "levels");
+		File f = new File(GameClient.inst.gameLocation, "levels");
 		if(!f.exists()) f.mkdirs();
-
+		
 		File[] f1 = f.listFiles();
 		if(f1 != null) for(File f2 : f1)
 		{
@@ -67,66 +63,72 @@ public class Main extends LMFrame implements IKeyPressed, IMouseScrolled, IMouse
 			{
 				try
 				{
-					JsonElement e = LMJsonUtils.getJsonElement(f2);
-
+					JsonElement e = LMJsonUtils.fromJson(f2);
+					
 					if(e != null && e.isJsonObject())
 					{
 						JsonObject o = e.getAsJsonObject();
 						Level l = Level.loadFromJson(f, o);
-						if(l != null) levels.put(l.ID, l);
+						if(l != null) levels.put(l.getID(), l);
 					}
 				}
 				catch(Exception e)
-				{ e.printStackTrace(); }
+				{
+					e.printStackTrace();
+				}
 			}
 		}
-
-		Main.logger.info("Loaded levels: " + levels.keySet());
+		
+		GameClient.logger.info("Loaded levels: " + levels.keySet());
 	}
-
+	
 	public void onRender() throws Exception
 	{
+		GLHelper.background.setF(1F, 1F, 1F, 1F);
+		
 		debugInfo.clear();
 		debugInfo.add("FPS: " + FPS);
-
+		
 		Renderer.enter2D();
 		GLHelper.texture.enable();
-
+		
 		if(clientWorld != null)
 		{
 			clientWorld.onUpdate();
-			clientWorld.renderer.render(renderer);
+			clientWorld.renderer.render();
 			//debugInfo.add(clientWorld.level.getTile(clientWorld.renderer.mouse.toPos2I()));
 		}
-
-		currentGui.onRender();
-
+		
+		GLHelper.color.setF(0F, 0F, 0F, 1F);
 		for(int i = 0; i < debugInfo.size(); i++)
-			font.drawText(4D, 4D + i * 20, String.valueOf(debugInfo.get(i)));
+			getGui().font.drawText(4D, 4D + i * 20, String.valueOf(debugInfo.get(i)));
 	}
-
+	
+	public static void test(Consumer<Integer> t)
+	{
+		t.accept(10);
+	}
+	
 	public void onKeyPressed(EventKeyPressed e)
 	{
-		if(e.key == Keyboard.KEY_ESCAPE)
-			destroy();
+		if(e.key == Keyboard.KEY_ESCAPE) destroy();
 		else if(e.key == Keyboard.KEY_I)
 		{
 			loadLevels();
 			clientWorld = new WorldClient(levels.get("test_level"));
 			return;
 		}
-
-		if(clientWorld != null)
-			clientWorld.clientPlayer.keyPressed(e.key);
+		
+		if(clientWorld != null) clientWorld.clientPlayer.keyPressed(e.key);
 	}
-
+	
 	public void onMousePressed(EventMousePressed e)
 	{
 		if(e.button == 1) Mouse.setGrabbed(!Mouse.isGrabbed());
 	}
-
+	
 	public void onMouseScrolled(EventMouseScrolled e)
 	{
-		//clientWorld.renderer.renderScale *= (LMMouse.dwheel > 0) ? 2D : 0.5D;
+		//clientWorld.renderer.renderScale *= e.up ? 2D : 0.5D;
 	}
 }

@@ -1,6 +1,5 @@
 package latmod.blowitup.entity;
 
-import latmod.blowitup.GameRenderer;
 import latmod.blowitup.world.*;
 import latmod.lib.Bits;
 import latmod.lib.*;
@@ -13,102 +12,121 @@ import java.io.*;
  */
 public class Entity
 {
-	public static final int DEAD = 0;
-	public static final int DIRTY = 1;
-	public static final int SNEAKING = 2;
-	public static final int LIGHT = 3;
-
+	public static final byte DEAD = 0;
+	public static final byte DIRTY = 1;
+	public static final byte SNEAKING = 2;
+	public static final byte LIGHT = 3;
+	
 	public World world;
 	public int worldID;
 	public final Pos2D pos;
-	public final boolean[] flags;
+	private byte flags;
 	public double radius = 0.75D;
-
+	
 	public Entity()
 	{
 		pos = new Pos2D();
-		flags = new boolean[8];
-
-		flags[DEAD] = false;
+		setFlag(DEAD, false);
 	}
-
+	
+	public boolean getFlag(byte flag) { return Bits.getBit(flags, flag); }
+	
+	public boolean setFlag(byte flag, boolean v)
+	{
+		if(getFlag(flag) != v)
+		{
+			flags = Bits.setBit(flags, flag, v);
+			return true;
+		}
+		return false;
+	}
+	
 	public final void onCreated(World w, int wid)
-	{ world = w; worldID = wid; onCreated(); }
-
+	{
+		world = w;
+		worldID = wid;
+		onCreated();
+	}
+	
 	public void writeToIO(DataOutput io) throws Exception
 	{
 		io.writeDouble(pos.x);
 		io.writeDouble(pos.y);
-		io.writeByte(Bits.toBits(flags));
+		io.writeByte(flags);
 	}
-
+	
 	public void readFromIO(DataInput io) throws Exception
 	{
 		pos.x = io.readDouble();
 		pos.y = io.readDouble();
-		Bits.fromBits(flags, io.readByte() & 0xFF);
+		flags = io.readByte();
 	}
-
-	public void markDirty()
-	{ flags[DIRTY] = true; }
-
+	
+	public void markDirty() { setFlag(DIRTY, true); }
+	
 	public void onCreated()
 	{
 	}
-
+	
 	public void onDeath()
 	{
 	}
-
+	
 	public void onUpdate()
 	{
 	}
-
-	public void onRender(GameRenderer r)
+	
+	public void onRender()
 	{
 	}
-
+	
 	public boolean move(double mx, double my)
 	{
 		double px = pos.x;
 		double py = pos.y;
-
+		
 		AABB box = createAABB();
 		if(box != null)
 		{
 			boolean collision = false;
 			AABB box1 = box.add(mx, 0D);
-
+			
 			for(AABB aabb : world.aabbs)
 			{
 				if(aabb.collidesWith(box1))
-				{ collision = true; break; }
+				{
+					collision = true;
+					break;
+				}
 			}
-
+			
 			if(collision) mx = 0D;
-
+			
 			collision = false;
 			box1 = box.add(0D, my);
-
+			
 			for(AABB aabb : world.aabbs)
 			{
 				if(aabb.collidesWith(box1))
-				{ collision = true; break; }
+				{
+					collision = true;
+					break;
+				}
 			}
-
+			
 			if(collision) my = 0D;
 		}
-
+		
 		//FIXME: Walls
 		pos.x += mx;
 		pos.y += my;
-
+		
 		pos.x = MathHelperLM.clamp(pos.x, 0.5D, world.level.width - 0.5D);
 		pos.y = MathHelperLM.clamp(pos.y, 0.5D, world.level.height - 0.5D);
-
+		
 		return px != pos.x || py != pos.y;
 	}
-
+	
 	public AABB createAABB()
 	{
 		double s = radius / 2D;

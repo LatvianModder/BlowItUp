@@ -7,11 +7,11 @@ public class TileAir extends Tile
 {
 	public TileAir()
 	{
-		super("air", 0xFF000000, (byte)0);
+		super("air", 0xFF000000, (byte) 0);
 		texture_name = null;
 		light_value = 0;
-		flags[FLAG_CAN_COLLIDE] = false;
-		flags[FLAG_CAN_EXPLODE] = false;
-		flags[FLAG_IS_TRANSPARENT] = true;
+		setFlag(FLAG_CAN_COLLIDE, false);
+		setFlag(FLAG_CAN_EXPLODE, false);
+		setFlag(FLAG_IS_TRANSPARENT, true);
 	}
 }

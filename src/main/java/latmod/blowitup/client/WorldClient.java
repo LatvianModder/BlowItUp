@@ -1,7 +1,7 @@
-package latmod.blowitup.world;
+package latmod.blowitup.client;
 
 import latmod.blowitup.entity.EntityPlayerSP;
-import latmod.lib.MathHelperLM;
+import latmod.blowitup.world.*;
 import latmod.lib.util.Pos2I;
 
 /**
@@ -11,18 +11,18 @@ public class WorldClient extends World
 {
 	public final WorldRenderer renderer;
 	public final EntityPlayerSP clientPlayer;
-
+	
 	public WorldClient(Level l)
 	{
 		super(l);
 		renderer = new WorldRenderer(this);
 		clientPlayer = new EntityPlayerSP();
 		clientPlayer.onCreated(this, 0);
-
+		
 		Pos2I spawnPoint = level.getRandomSpawnpoint();
 		clientPlayer.pos.set(spawnPoint.x + 0.5D, spawnPoint.y + 0.5D);
 	}
-
+	
 	public void onUpdate()
 	{
 		super.onUpdate();

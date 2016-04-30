@@ -1,5 +1,6 @@
 package latmod.blowitup.gui;
 
+import latmod.core.IWindow;
 import latmod.core.gui.Button;
 import latmod.core.gui.Gui;
 import latmod.core.input.EventMousePressed;
@@ -9,9 +10,9 @@ import latmod.core.input.EventMousePressed;
  */
 public class GuiStart extends Gui
 {
-	public GuiStart()
+	public GuiStart(IWindow w)
 	{
-		super("start", null);
+		super(w, "start");
 	}
 	
 	@Override

@@ -5,6 +5,8 @@ import com.google.gson.JsonObject;
 import latmod.blowitup.entity.EntityRegistry;
 import latmod.blowitup.gui.GuiStart;
 import latmod.blowitup.world.Level;
+import latmod.core.EventHandler;
+import latmod.core.EventResized;
 import latmod.core.LMFrame;
 import latmod.core.LatCoreGL;
 import latmod.core.input.EventKeyPressed;
@@ -57,8 +59,12 @@ public class GameClient extends LMFrame
 		loadLevels();
 		EntityRegistry.init();
 		
-		openGui(new GuiStart());
+		openGui(new GuiStart(this));
 		debugInfo = new ArrayList<>();
+		
+		EventHandler.MAIN.addHandler(EventResized.class, event -> {
+			System.out.println(event.prevWidth + " : " + event.prevHeight);
+		});
 	}
 	
 	public static void loadLevels()
@@ -124,21 +130,30 @@ public class GameClient extends LMFrame
 		{
 			loadLevels();
 			clientWorld = new WorldClient(levels.get("test_level"));
-			return;
+			e.cancel();
 		}
 		
 		if(clientWorld != null) clientWorld.clientPlayer.keyPressed(e.key);
+		
+		super.onKeyPressed(e);
 	}
 	
 	@Override
 	public void onMousePressed(EventMousePressed e)
 	{
-		if(e.button == 1) LMInput.setMouseGrabbed(!LMInput.isMouseGrabbed());
+		if(e.button == 1)
+		{
+			LMInput.setMouseGrabbed(!LMInput.isMouseGrabbed());
+			e.cancel();
+		}
+		
+		super.onMousePressed(e);
 	}
 	
 	@Override
 	public void onMouseScrolled(EventMouseScrolled e)
 	{
 		//clientWorld.renderer.renderScale *= e.up ? 2D : 0.5D;
+		super.onMouseScrolled(e);
 	}
 }

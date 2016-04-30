@@ -1,7 +1,8 @@
 package latmod.blowitup.client;
 
 import latmod.blowitup.entity.EntityPlayerSP;
-import latmod.blowitup.world.*;
+import latmod.blowitup.world.Level;
+import latmod.blowitup.world.World;
 import latmod.lib.util.Pos2I;
 
 /**
@@ -23,6 +24,7 @@ public class WorldClient extends World
 		clientPlayer.pos.set(spawnPoint.x + 0.5D, spawnPoint.y + 0.5D);
 	}
 	
+	@Override
 	public void onUpdate()
 	{
 		super.onUpdate();

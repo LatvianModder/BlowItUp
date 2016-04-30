@@ -1,13 +1,13 @@
 package latmod.blowitup.tile;
 
 import com.google.gson.JsonObject;
-import latmod.blowitup.client.GameClient;
 import latmod.core.Resource;
 import latmod.core.rendering.Texture;
 import latmod.lib.Bits;
 import latmod.lib.util.FinalIDObject;
 
-import java.io.*;
+import java.io.DataInput;
+import java.io.DataOutput;
 
 /**
  * Created by LatvianModder on 27.12.2015.
@@ -84,9 +84,9 @@ public class Tile extends FinalIDObject
 	{
 		if(texture == null)
 		{
-			String s = (texture_name != null) ? texture_name : "tiles/" + getID() + ".png";
-			texture = GameClient.inst.getTextureManager().getTexture(Resource.getTexture(s));
+			texture = new Texture(new Resource("blowitup", "textures/" + ((texture_name != null) ? texture_name : "tiles/" + getID()) + ".png"));
 		}
+		
 		return texture;
 	}
 	

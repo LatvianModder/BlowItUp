@@ -1,9 +1,9 @@
 package latmod.blowitup.client;
 
-import latmod.core.input.LMKeyboard;
+import latmod.core.input.LMInput;
 import latmod.lib.LMColor;
 import latmod.lib.util.FinalIDObject;
-import org.lwjgl.input.Keyboard;
+import org.lwjgl.glfw.GLFW;
 
 /**
  * Created by LatvianModder on 29.12.2015.
@@ -20,14 +20,14 @@ public class ClientSettings
 	
 	public static class KeyBinding extends FinalIDObject
 	{
-		public static final KeyBinding up = new KeyBinding("up", Keyboard.KEY_W);
-		public static final KeyBinding down = new KeyBinding("down", Keyboard.KEY_S);
-		public static final KeyBinding left = new KeyBinding("left", Keyboard.KEY_A);
-		public static final KeyBinding right = new KeyBinding("right", Keyboard.KEY_D);
-		public static final KeyBinding sneak = new KeyBinding("sneak", Keyboard.KEY_LSHIFT);
-		public static final KeyBinding attack = new KeyBinding("attack", Keyboard.KEY_SPACE);
-		public static final KeyBinding flashlight = new KeyBinding("flashlight", Keyboard.KEY_F);
-		public static final KeyBinding chat = new KeyBinding("chat", Keyboard.KEY_Y);
+		public static final KeyBinding up = new KeyBinding("up", GLFW.GLFW_KEY_W);
+		public static final KeyBinding down = new KeyBinding("down", GLFW.GLFW_KEY_S);
+		public static final KeyBinding left = new KeyBinding("left", GLFW.GLFW_KEY_A);
+		public static final KeyBinding right = new KeyBinding("right", GLFW.GLFW_KEY_D);
+		public static final KeyBinding sneak = new KeyBinding("sneak", GLFW.GLFW_KEY_LEFT_SHIFT);
+		public static final KeyBinding attack = new KeyBinding("attack", GLFW.GLFW_KEY_SPACE);
+		public static final KeyBinding flashlight = new KeyBinding("flashlight", GLFW.GLFW_KEY_F);
+		public static final KeyBinding chat = new KeyBinding("chat", GLFW.GLFW_KEY_T);
 		
 		public final int defKey;
 		
@@ -43,8 +43,11 @@ public class ClientSettings
 			return defKey;
 		}
 		
-		public String getAsString() { return Keyboard.getKeyName(get()); }
+		@Override
+		public String toString()
+		{ return GLFW.glfwGetKeyName(get(), 0); }
 		
-		public boolean isPressed() { return LMKeyboard.isKeyDown(get()); }
+		public boolean isPressed()
+		{ return LMInput.isKeyDown(get()); }
 	}
 }

@@ -1,6 +1,7 @@
 package latmod.blowitup.gui;
 
-import latmod.core.gui.*;
+import latmod.core.gui.Button;
+import latmod.core.gui.Gui;
 import latmod.core.input.EventMousePressed;
 
 /**
@@ -10,13 +11,15 @@ public class GuiStart extends Gui
 {
 	public GuiStart()
 	{
-		super("start");
+		super("start", null);
 	}
 	
-	public void loadWidgets()
+	@Override
+	public void addWidgets()
 	{
 		mainPanel.add(new Button("play", 0, 0, 100, 20, "Play")
 		{
+			@Override
 			public void onPressed(EventMousePressed e)
 			{
 			}
@@ -24,6 +27,7 @@ public class GuiStart extends Gui
 		
 		mainPanel.add(new Button("exit", 0, 100, 100, 20, "Exit")
 		{
+			@Override
 			public void onPressed(EventMousePressed e)
 			{
 			}

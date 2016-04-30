@@ -1,10 +1,13 @@
 package latmod.blowitup.entity;
 
-import latmod.blowitup.client.*;
+import latmod.blowitup.client.ClientSettings;
+import latmod.blowitup.client.WorldClient;
 import latmod.blowitup.tile.Tile;
-import latmod.core.input.LMMouse;
-import latmod.lib.util.*;
-import org.lwjgl.input.Keyboard;
+import latmod.core.IWindow;
+import latmod.core.input.LMInput;
+import latmod.lib.util.Pos2D;
+import latmod.lib.util.Pos2I;
+import org.lwjgl.glfw.GLFW;
 
 /**
  * Created by LatvianModder on 29.12.2015.
@@ -16,11 +19,13 @@ public class EntityPlayerSP extends EntityPlayer
 		super();
 	}
 	
+	@Override
 	public void onCreated()
 	{
 		super.onCreated();
 	}
 	
+	@Override
 	public void onUpdate()
 	{
 		WorldClient clientWorld = (WorldClient) world;
@@ -65,11 +70,11 @@ public class EntityPlayerSP extends EntityPlayer
 			else if(keyRight) rotation -= 45F;
 		}
 		
-		if(LMMouse.dx != 0 || LMMouse.dy != 0 || LMMouse.isButtonDown(0))
+		if(LMInput.mouseDX != 0 || LMInput.mouseDY != 0 || LMInput.isMouseDown(GLFW.GLFW_MOUSE_BUTTON_LEFT))
 		{
 			Pos2D screen = clientWorld.renderer.getPosOnScreen(pos.x, pos.y);
 			
-			rotation = (float) (Math.atan2(LMMouse.y - screen.y, LMMouse.x - screen.x) * 180D / Math.PI);
+			rotation = (float) (Math.atan2(LMInput.mouseY - screen.y, LMInput.mouseX - screen.x) * 180D / Math.PI);
 		}
 		
 		if(move(mx, my))
@@ -83,9 +88,10 @@ public class EntityPlayerSP extends EntityPlayer
 		posI.set(posI1.x, posI1.y);
 	}
 	
-	public void onRender()
+	@Override
+	public void onRender(IWindow window)
 	{
-		super.onRender();
+		super.onRender(window);
 	}
 	
 	public void keyPressed(int key)
@@ -101,9 +107,9 @@ public class EntityPlayerSP extends EntityPlayer
 		
 		Pos2I p = clientWorld.renderer.mouse.toPos2I();
 		
-		if(key == Keyboard.KEY_R) clientWorld.level.setTile(p, Tile.air);
-		else if(key == Keyboard.KEY_L) clientWorld.level.setTile(p, clientWorld.level.getTileFromID("lamp"));
-		else if(key == Keyboard.KEY_P) clientWorld.level.setTile(p, clientWorld.level.getTileFromID("planks"));
+		if(key == GLFW.GLFW_KEY_R) clientWorld.level.setTile(p, Tile.air);
+		else if(key == GLFW.GLFW_KEY_L) clientWorld.level.setTile(p, clientWorld.level.getTileFromID("lamp"));
+		else if(key == GLFW.GLFW_KEY_P) clientWorld.level.setTile(p, clientWorld.level.getTileFromID("planks"));
 		clientWorld.renderer.markDirty();
 	}
 }

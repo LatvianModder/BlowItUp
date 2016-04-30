@@ -2,11 +2,15 @@ package latmod.blowitup.client;
 
 import latmod.blowitup.entity.Entity;
 import latmod.blowitup.tile.Tile;
+import latmod.core.IWindow;
 import latmod.core.Resource;
-import latmod.core.input.LMMouse;
-import latmod.core.rendering.*;
+import latmod.core.input.LMInput;
+import latmod.core.rendering.GLHelper;
+import latmod.core.rendering.Renderer;
+import latmod.core.rendering.Texture;
 import latmod.lib.MathHelperLM;
-import latmod.lib.util.*;
+import latmod.lib.util.Pos2D;
+import latmod.lib.util.Pos2I;
 import org.lwjgl.opengl.GL11;
 
 import java.util.Map;
@@ -16,6 +20,8 @@ import java.util.Map;
  */
 public class WorldRenderer
 {
+	public static final Texture textureFloor = new Texture(new Resource("blowitup", "textures/world/floor.png"));
+	
 	public final WorldClient world;
 	public final Pos2D camera;
 	public final Pos2D render;
@@ -24,7 +30,6 @@ public class WorldRenderer
 	private boolean isLightDirty = true;
 	private static int renderListID = -1;
 	private static int lightListID = -1;
-	public Texture floorTexture;
 	public final Pos2D mouse;
 	private final LightTile[][] lightMap;
 	
@@ -41,17 +46,12 @@ public class WorldRenderer
 				lightMap[x][y] = new LightTile();
 	}
 	
-	public void render()
+	public void render(IWindow window)
 	{
 		if(renderListID == -1)
 		{
 			renderListID = Renderer.createListID();
 			lightListID = Renderer.createListID();
-		}
-		
-		if(floorTexture == null)
-		{
-			floorTexture = GameClient.inst.getTextureManager().getTexture(Resource.getTexture("world/floor.png"));
 		}
 		
 		int w = world.level.width;
@@ -77,8 +77,8 @@ public class WorldRenderer
 		if(render.x > screenW) render.x = screenW;
 		if(render.y > screenH) render.y = screenH;
 		
-		mouse.x = (LMMouse.x + render.x * s) / s;
-		mouse.y = (LMMouse.y + render.y * s) / s;
+		mouse.x = (LMInput.mouseX + render.x * s) / s;
+		mouse.y = (LMInput.mouseY + render.y * s) / s;
 		
 		GLHelper.push();
 		GLHelper.translate(-render.x * s, -render.y * s);
@@ -89,18 +89,14 @@ public class WorldRenderer
 			isDirty = false;
 			Renderer.updateList(renderListID);
 			
-			floorTexture.bind();
+			window.getTextureManager().bind(textureFloor);
 			Renderer.rect(0D, 0D, w, h, 0D, 0D, w, h);
 			
 			for(Map.Entry<Pos2I, Tile> e : world.level.tiles())
 			{
-				Texture t = e.getValue().getTexture();
-				if(t != null)
-				{
-					t.bind();
-					Pos2I p = e.getKey();
-					Renderer.rect(p.x, p.y, 1D, 1D);
-				}
+				window.getTextureManager().bind(e.getValue().getTexture());
+				Pos2I p = e.getKey();
+				Renderer.rect(p.x, p.y, 1D, 1D);
 			}
 			
 			GLHelper.texture.disable();
@@ -256,8 +252,8 @@ public class WorldRenderer
 		GLHelper.texture.enable();
 		
 		for(Entity e : world.entities)
-			e.onRender();
-		world.clientPlayer.onRender();
+			e.onRender(window);
+		world.clientPlayer.onRender(window);
 		
 		GLHelper.texture.disable();
 		if(world.level.ambient_light < 1F) Renderer.renderList(lightListID);

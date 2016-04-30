@@ -1,18 +1,26 @@
 package latmod.blowitup.client;
 
-import com.google.gson.*;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import latmod.blowitup.entity.EntityRegistry;
 import latmod.blowitup.gui.GuiStart;
 import latmod.blowitup.world.Level;
-import latmod.core.*;
-import latmod.core.input.*;
-import latmod.core.rendering.*;
+import latmod.core.LMFrame;
+import latmod.core.LatCoreGL;
+import latmod.core.input.EventKeyPressed;
+import latmod.core.input.EventMousePressed;
+import latmod.core.input.EventMouseScrolled;
+import latmod.core.input.LMInput;
+import latmod.core.rendering.GLHelper;
+import latmod.core.rendering.Renderer;
 import latmod.lib.LMJsonUtils;
-import org.lwjgl.input.*;
+import org.lwjgl.glfw.GLFW;
 
 import java.io.File;
-import java.util.*;
-import java.util.function.Consumer;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -34,8 +42,11 @@ public class GameClient extends LMFrame
 	public List<Object> debugInfo;
 	public static final Map<String, Level> levels = new HashMap<>();
 	
-	public void onLoaded() throws Exception
+	@Override
+	public void onLoaded()
 	{
+		inst = this;
+		
 		super.onLoaded();
 		logger.setParent(LatCoreGL.logger);
 		setTitle("Blow It Up");
@@ -82,9 +93,10 @@ public class GameClient extends LMFrame
 		GameClient.logger.info("Loaded levels: " + levels.keySet());
 	}
 	
-	public void onRender() throws Exception
+	@Override
+	public void onRender()
 	{
-		GLHelper.background.setF(1F, 1F, 1F, 1F);
+		GLHelper.background.setF(0F, 0F, 0F, 1F);
 		
 		debugInfo.clear();
 		debugInfo.add("FPS: " + FPS);
@@ -95,24 +107,20 @@ public class GameClient extends LMFrame
 		if(clientWorld != null)
 		{
 			clientWorld.onUpdate();
-			clientWorld.renderer.render();
+			clientWorld.renderer.render(this);
 			//debugInfo.add(clientWorld.level.getTile(clientWorld.renderer.mouse.toPos2I()));
 		}
 		
-		GLHelper.color.setF(0F, 0F, 0F, 1F);
+		GLHelper.color.setF(1F, 1F, 1F, 1F);
 		for(int i = 0; i < debugInfo.size(); i++)
 			getGui().font.drawText(4D, 4D + i * 20, String.valueOf(debugInfo.get(i)));
 	}
 	
-	public static void test(Consumer<Integer> t)
-	{
-		t.accept(10);
-	}
-	
+	@Override
 	public void onKeyPressed(EventKeyPressed e)
 	{
-		if(e.key == Keyboard.KEY_ESCAPE) destroy();
-		else if(e.key == Keyboard.KEY_I)
+		if(e.key == GLFW.GLFW_KEY_ESCAPE) destroy();
+		else if(e.key == GLFW.GLFW_KEY_I)
 		{
 			loadLevels();
 			clientWorld = new WorldClient(levels.get("test_level"));
@@ -122,11 +130,13 @@ public class GameClient extends LMFrame
 		if(clientWorld != null) clientWorld.clientPlayer.keyPressed(e.key);
 	}
 	
+	@Override
 	public void onMousePressed(EventMousePressed e)
 	{
-		if(e.button == 1) Mouse.setGrabbed(!Mouse.isGrabbed());
+		if(e.button == 1) LMInput.setMouseGrabbed(!LMInput.isMouseGrabbed());
 	}
 	
+	@Override
 	public void onMouseScrolled(EventMouseScrolled e)
 	{
 		//clientWorld.renderer.renderScale *= e.up ? 2D : 0.5D;

@@ -1,11 +1,14 @@
 package latmod.blowitup.entity;
 
-import latmod.blowitup.world.*;
+import latmod.blowitup.world.AABB;
+import latmod.blowitup.world.World;
+import latmod.core.IWindow;
 import latmod.lib.Bits;
-import latmod.lib.*;
+import latmod.lib.MathHelperLM;
 import latmod.lib.util.Pos2D;
 
-import java.io.*;
+import java.io.DataInput;
+import java.io.DataOutput;
 
 /**
  * Created by LatvianModder on 27.12.2015.
@@ -76,7 +79,7 @@ public class Entity
 	{
 	}
 	
-	public void onRender()
+	public void onRender(IWindow window)
 	{
 	}
 	

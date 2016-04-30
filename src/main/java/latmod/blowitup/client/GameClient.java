@@ -102,12 +102,15 @@ public class GameClient extends LMFrame
 	@Override
 	public void onRender()
 	{
-		GLHelper.background.setF(0F, 0F, 0F, 1F);
+		GLHelper.background.setF(0.2F, 0.2F, 0.2F, 1F);
 		
 		debugInfo.clear();
 		debugInfo.add("FPS: " + FPS);
 		
 		Renderer.enter2D();
+		GLHelper.texture.disable();
+		GLHelper.color.setF(1F, 1F, 1F, 1F);
+		Renderer.rect(10, 10, 100, 10);
 		GLHelper.texture.enable();
 		
 		if(clientWorld != null)

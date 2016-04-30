@@ -191,9 +191,10 @@ public class WorldRenderer
 					l.c = (l.nn + l.pn + l.np + l.pp) / 4F;
 				}
 			
-			Renderer.beginTriangles();
+			Renderer.begin(GL11.GL_TRIANGLES);
 			
 			for(int y = 0; y < h; y++)
+			{
 				for(int x = 0; x < w; x++)
 				{
 					LightTile l = lightMap[x][y];
@@ -240,6 +241,7 @@ public class WorldRenderer
 					GLHelper.color.setF(0F, 0F, 0F, l.nn);
 					Renderer.vertex(x, y);
 				}
+			}
 			
 			Renderer.end();
 			

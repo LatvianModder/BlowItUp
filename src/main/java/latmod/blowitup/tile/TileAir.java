@@ -5,13 +5,13 @@ package latmod.blowitup.tile;
  */
 public class TileAir extends Tile
 {
-	public TileAir()
-	{
-		super("air", 0xFF000000, (byte) 0);
-		texture_name = null;
-		light_value = 0;
-		setFlag(FLAG_CAN_COLLIDE, false);
-		setFlag(FLAG_CAN_EXPLODE, false);
-		setFlag(FLAG_IS_TRANSPARENT, true);
-	}
+    public TileAir()
+    {
+        super("air", 0xFF000000, (byte) 0);
+        texture_name = null;
+        light_value = 0;
+        setFlag(FLAG_CAN_COLLIDE, false);
+        setFlag(FLAG_CAN_EXPLODE, false);
+        setFlag(FLAG_IS_TRANSPARENT, true);
+    }
 }
